@@ -1,5 +1,11 @@
-package gitstuff.team02-f22-5pm-1.src.main.java.edu.ucsb.cs156.example.repositories;
+package edu.ucsb.cs156.example.repositories;
 
-public class UCSBHelpRequestRepository {
-    
+import edu.ucsb.cs156.example.entities.UCSBHelpRequest;
+
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface UCSBHelpRequestRepository extends CrudRepository<UCSBHelpRequest, Long> {
+  
 }
