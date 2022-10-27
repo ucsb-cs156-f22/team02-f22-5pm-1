@@ -90,5 +90,26 @@ public class ArticleController extends ApiController {
         articleRepository.delete(articles);
         return genericMessage("Article with id %s deleted".formatted(title));
     }
-    // Update
+
+    @ApiOperation(value = "Update a single article")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("")
+    public Article updateArticle(
+            @ApiParam("title") @RequestParam String title,
+            @RequestBody @Valid Article incoming) {
+
+        Article article = articleRepository.findById(title)
+                .orElseThrow(() -> new EntityNotFoundException(Article.class, title));
+
+
+        article.setTitle(incoming.getTitle());  
+        article.setUrl(incoming.getUrl());
+        article.setExplanation(incoming.getExplanation());
+        article.setEmail(incoming.getEmail());
+        article.setDateAdded(incoming.getDateAdded());
+
+        articleRepository.save(article);
+
+        return article;
+    }
 }
