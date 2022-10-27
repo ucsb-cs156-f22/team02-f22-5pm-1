@@ -146,6 +146,37 @@ public class ArticleControllerTests extends ControllerTestCase {
                 assertEquals(expectedJson, responseString);
         }
 
-        // admin can delete a date
+        
+        @WithMockUser(roles = { "ADMIN", "USER" })
+        @Test
+        public void admin_can_delete_a_date() throws Exception {
+                // arrange
+
+                LocalDateTime ldt = LocalDateTime.parse("2022-01-03T00:00:00");
+
+                Article article4 = Article.builder()
+                        .title("ArticleFour")
+                        .url("articlefour")
+                        .explanation("articlefour explanation")
+                        .email("liamjet@gmail.com")
+                        .dateAdded(ldt)
+                        .build();
+
+                when(articleRepository.findById(eq("ArticleFour"))).thenReturn(Optional.of(article4));
+
+                // act
+                MvcResult response = mockMvc.perform(
+                                delete("/api/Article?title=ArticleFour")
+                                                .with(csrf()))
+                                .andExpect(status().isOk()).andReturn();
+
+                // assert
+                verify(articleRepository, times(1)).findById("ArticleFour");
+                verify(articleRepository, times(1)).delete(any());
+
+                Map<String, Object> json = responseToJson(response);
+                assertEquals("Article with id ArticleFour deleted", json.get("message"));
+        }
+        
         
 }
