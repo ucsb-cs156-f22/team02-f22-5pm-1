@@ -44,7 +44,66 @@ public class ArticleControllerTests extends ControllerTestCase {
 
         // Authorization tests for /api/Article/admin/all
 
-        
+        @Test
+        public void logged_out_users_cannot_get_all() throws Exception {
+                mockMvc.perform(get("/api/Article/all"))
+                                .andExpect(status().is(403)); // logged out users can't get all
+        }
+
+        @WithMockUser(roles = { "USER" })
+        @Test
+        public void logged_in_users_can_get_all() throws Exception {
+                mockMvc.perform(get("/api/Article/all"))
+                                .andExpect(status().is(200)); // logged
+        }
+
+        @Test
+        public void logged_out_users_cannot_get_by_id() throws Exception {
+                mockMvc.perform(get("/api/Article?title=article"))
+                                .andExpect(status().is(403)); // logged out users can't get by id
+        }
+
+
+        @WithMockUser(roles = { "USER" })
+        @Test
+        public void logged_in_user_can_get_all_articles() throws Exception {
+
+                // arrange
+
+                LocalDateTime ldt = LocalDateTime.parse("2022-01-03T00:00:00");
+
+                Article article1 = Article.builder()
+                                .title("ArticleOne")
+                                .url("articleone")
+                                .explanation("articleone explanation")
+                                .email("liamjet@gmail.com")
+                                .dateAdded(ldt)
+                                .build();
+
+                Article article2 = Article.builder()
+                                .title("ArticleTwo")
+                                .url("articletwo")
+                                .explanation("articletwo explanation")
+                                .email("liamjet@gmail.com")
+                                .dateAdded(ldt)
+                                .build();
+
+                ArrayList<Article> expectedArticle = new ArrayList<>();
+                expectedArticle.addAll(Arrays.asList(article1, article2));
+
+                when(articleRepository.findAll()).thenReturn(expectedArticle);
+
+                // act
+                MvcResult response = mockMvc.perform(get("/api/Article/all"))
+                                .andExpect(status().isOk()).andReturn();
+
+                // assert
+
+                verify(articleRepository, times(1)).findAll();
+                String expectedJson = mapper.writeValueAsString(expectedArticle);
+                String responseString = response.getResponse().getContentAsString();
+                assertEquals(expectedJson, responseString);
+        }
 
         // Authorization tests for /api/Article/post
         // (Perhaps should also have these for put and delete)
@@ -118,7 +177,7 @@ public class ArticleControllerTests extends ControllerTestCase {
 
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
-        public void an_admin_user_can_post_a_new_commons() throws Exception {
+        public void an_admin_user_can_post_a_new_article() throws Exception {
                 // arrange
 
                 LocalDateTime ldt = LocalDateTime.parse("2022-01-03T00:00:00");
@@ -178,5 +237,24 @@ public class ArticleControllerTests extends ControllerTestCase {
                 assertEquals("Article with id ArticleFour deleted", json.get("message"));
         }
         
+        @WithMockUser(roles = { "ADMIN", "USER" })
+        @Test
+        public void admin_tries_to_delete_non_existant_article_and_gets_right_error_message()
+                        throws Exception {
+                // arrange
+
+                when(articleRepository.findById(eq("ArticleDoesntExist"))).thenReturn(Optional.empty());
+
+                // act
+                MvcResult response = mockMvc.perform(
+                                delete("/api/Article?title=ArticleDoesntExist")
+                                                .with(csrf()))
+                                .andExpect(status().isNotFound()).andReturn();
+
+                // assert
+                verify(articleRepository, times(1)).findById("ArticleDoesntExist");
+                Map<String, Object> json = responseToJson(response);
+                assertEquals("Article with id ArticleDoesntExist not found", json.get("message"));
+        }
         
 }
