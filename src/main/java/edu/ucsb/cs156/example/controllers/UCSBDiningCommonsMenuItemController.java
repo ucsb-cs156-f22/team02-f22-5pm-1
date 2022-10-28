@@ -41,17 +41,7 @@ public class UCSBDiningCommonsMenuItemController extends ApiController {
         return items;
     }
 
-    @ApiOperation(value = "Get a single date")
-    @PreAuthorize("hasRole('ROLE_USER')")
-    @GetMapping("")
-    public UCSBDiningCommonsMenu getById(
-            @ApiParam("id") @RequestParam Long id) {
-        UCSBDiningCommonsMenu ucsbDiningCommonsMenu = ucsbDiningCommonsMenuRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(UCSBDiningCommonsMenu.class, id));
-
-        return ucsbDiningCommonsMenu;
-    }
-
+   
     @ApiOperation(value = "Create a new date")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/post")
@@ -72,34 +62,5 @@ public class UCSBDiningCommonsMenuItemController extends ApiController {
         return savedUcsbDiningCommonsMenu;
     }
 
-    @ApiOperation(value = "Delete a UCSBDiningCommonsMenuItem")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @DeleteMapping("")
-    public Object deleteUCSBDiningCommonsMenu(
-            @ApiParam("id") @RequestParam Long id) {
-        UCSBDiningCommonsMenu ucsbDiningCommonsMenu = ucsbDiningCommonsMenuRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(UCSBDiningCommonsMenu.class, id));
-
-        ucsbDiningCommonsMenuRepository.delete(ucsbDiningCommonsMenu);
-        return genericMessage("UCSBDiningCommonsMenu with id %s deleted".formatted(id));
-    }
-
-    @ApiOperation(value = "Update a single dining commons menu item")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PutMapping("")
-    public UCSBDiningCommonsMenu updateUCSBDiningCommonsMenu(
-            @ApiParam("id") @RequestParam Long id,
-            @RequestBody @Valid UCSBDiningCommonsMenu incoming) {
-
-        UCSBDiningCommonsMenu ucsbDiningCommonsMenu = ucsbDiningCommonsMenuRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(UCSBDiningCommonsMenu.class, id));
-
-        ucsbDiningCommonsMenu.setDiningCommonsCode(incoming.getDiningCommonsCode());
-        ucsbDiningCommonsMenu.setName(incoming.getName());
-        ucsbDiningCommonsMenu.setStation(incoming.getStation());
-
-        ucsbDiningCommonsMenuRepository.save(ucsbDiningCommonsMenu);
-
-        return ucsbDiningCommonsMenu;
-    }
+   
 }
