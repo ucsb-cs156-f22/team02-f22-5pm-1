@@ -36,7 +36,13 @@ public class ArticleController extends ApiController {
     @Autowired
     ArticleRepository articleRepository;
 
-    // List
+    @ApiOperation(value = "List all articles")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @GetMapping("/all")
+    public Iterable<Article> allArticles() {
+        Iterable<Article> article = articleRepository.findAll();
+        return article;
+    }
 
     @ApiOperation(value = "Get a single article")
     @PreAuthorize("hasRole('ROLE_USER')")
@@ -73,7 +79,37 @@ public class ArticleController extends ApiController {
         return savedArticles;
     }
 
-    // Delete
-    
-    // Update
+    @ApiOperation(value = "Delete an article")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @DeleteMapping("")
+    public Object deleteArticle(
+            @ApiParam("title") @RequestParam String title) {
+        Article articles = articleRepository.findById(title)
+                .orElseThrow(() -> new EntityNotFoundException(Article.class, title));
+
+        articleRepository.delete(articles);
+        return genericMessage("Article with id %s deleted".formatted(title));
+    }
+
+    @ApiOperation(value = "Update a single article")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("")
+    public Article updateArticle(
+            @ApiParam("title") @RequestParam String title,
+            @RequestBody @Valid Article incoming) {
+
+        Article article = articleRepository.findById(title)
+                .orElseThrow(() -> new EntityNotFoundException(Article.class, title));
+
+
+        article.setTitle(incoming.getTitle());  
+        article.setUrl(incoming.getUrl());
+        article.setExplanation(incoming.getExplanation());
+        article.setEmail(incoming.getEmail());
+        article.setDateAdded(incoming.getDateAdded());
+
+        articleRepository.save(article);
+
+        return article;
+    }
 }
