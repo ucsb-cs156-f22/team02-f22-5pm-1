@@ -89,7 +89,7 @@ public class MenuItemReviewController extends ApiController {
     @DeleteMapping("")
     public Object deleteMenuItemReview(
             @ApiParam("id") @RequestParam Long id) {
-        MenuItemReview menuItemReview = MenuItemReviewRepository.findById(id)
+        MenuItemReview menuItemReview = menuItemReviewRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(MenuItemReview.class, id));
 
         menuItemReviewRepository.delete(menuItemReview);
