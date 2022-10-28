@@ -112,5 +112,4 @@ public class ArticleController extends ApiController {
 
         return article;
     }
-    // Dummy commit
 }
