@@ -50,9 +50,9 @@ public class RecommendationControllerTests extends ControllerTestCase {
     }
 
     @Test
-    public void logged_out_users_cannot_get_by_id() throws Exception {
-        mockMvc.perform(get("/api/recommendations?id=7"))
-                .andExpect(status().is(403)); // logged out users can't get by id
+    public void logged_out_users_cannot_get_all() throws Exception {
+        mockMvc.perform(get("/api/recommendations/all"))
+                .andExpect(status().is(403)); // logged out users can't get all
     }
 
     // Controller test for get
