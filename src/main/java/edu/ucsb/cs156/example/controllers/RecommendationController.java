@@ -34,6 +34,14 @@ public class RecommendationController extends ApiController {
     @Autowired
     RecommendationRepository recommendationRepository;
 
+    @ApiOperation(value = "List all recommendation requests")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @GetMapping("/all")
+    public Iterable<Recommendation> allRecommendations() {
+        Iterable<Recommendation> recs = recommendationRepository.findAll();
+        return recs;
+    }
+
     @ApiOperation(value = "Get a recommendation by ID")
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("")
@@ -43,5 +51,31 @@ public class RecommendationController extends ApiController {
                 .orElseThrow(() -> new EntityNotFoundException(Recommendation.class, id));
         
         return recommendation;
+    }
+
+    @ApiOperation(value = "Create a new recommendation request")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/post")
+    public Recommendation postRecommendation(
+        @ApiParam("requesterEmail") @RequestParam String requesterEmail,
+        @ApiParam("professorEmail") @RequestParam String professorEmail,
+        @ApiParam("explanation") @RequestParam String explanation,
+        @ApiParam("dateRequested") @RequestParam("dateRequested") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateRequested,
+        @ApiParam("dateNeeded") @RequestParam("dateNeeded") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateNeeded,
+        @ApiParam("done") @RequestParam boolean done
+    ) throws JsonProcessingException {
+        log.info("dateRequested={}, dateNeeded={}", dateRequested, dateNeeded);
+
+        Recommendation recommendation = new Recommendation();
+        recommendation.setRequesterEmail(requesterEmail);
+        recommendation.setProfessorEmail(professorEmail);
+        recommendation.setExplanation(explanation);
+        recommendation.setDateRequested(dateRequested);
+        recommendation.setDateNeeded(dateNeeded);
+        recommendation.setDone(done);
+
+        Recommendation savedRecommendation = recommendationRepository.save(recommendation);
+
+        return savedRecommendation;
     }
 }
