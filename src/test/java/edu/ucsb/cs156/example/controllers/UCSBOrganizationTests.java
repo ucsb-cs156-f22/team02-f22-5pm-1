@@ -174,7 +174,6 @@ public class UCSBOrganizationTests  extends ControllerTestCase {
                 // arrange
 
                 UCSBOrganization organization = UCSBOrganization.builder()
-                                .id(1234)
                                 .orgCode("test")
                                 .orgTranslation("test1")
                                 .orgTranslationShort("test2")
@@ -185,7 +184,7 @@ public class UCSBOrganizationTests  extends ControllerTestCase {
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                post("/api/ucsborganization/post?id=1234&orgCode=test&orgTranslation=test1&orgTranslationShort=test2&inactive=false")
+                                post("/api/ucsborganization/post?orgCode=test&orgTranslation=test1&orgTranslationShort=test2&inactive=false")
                                                 .with(csrf()))
                                 .andExpect(status().isOk()).andReturn();
 
