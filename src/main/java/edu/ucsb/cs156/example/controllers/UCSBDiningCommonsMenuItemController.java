@@ -41,7 +41,17 @@ public class UCSBDiningCommonsMenuItemController extends ApiController {
         return items;
     }
 
-   
+    @ApiOperation(value = "Get a single date")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @GetMapping("")
+    public UCSBDiningCommonsMenu getById(
+            @ApiParam("id") @RequestParam Long id) {
+        UCSBDiningCommonsMenu ucsbDiningCommonsMenu = ucsbDiningCommonsMenuRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(UCSBDiningCommonsMenu.class, id));
+
+        return ucsbDiningCommonsMenu;
+    }
+
     @ApiOperation(value = "Create a new date")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/post")
