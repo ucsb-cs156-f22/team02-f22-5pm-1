@@ -57,11 +57,11 @@ public class MenuItemReviewControllerTests extends ControllerTestCase {
                                 .andExpect(status().is(200)); // logged
         }
 
-        /*@Test
+        @Test
         public void logged_out_users_cannot_get_by_id() throws Exception {
                 mockMvc.perform(get("/api/MenuItemReview?id=7"))
                                 .andExpect(status().is(403)); // logged out users can't get by id
-        }*/
+        }
 
         // Authorization tests for /api/MenuItemReview/post
         // (Perhaps should also have these for put and delete)
@@ -80,30 +80,30 @@ public class MenuItemReviewControllerTests extends ControllerTestCase {
         }
 
         // // Tests with mocks for database actions
-        /*
         @WithMockUser(roles = { "USER" })
         @Test
         public void test_that_logged_in_user_can_get_by_id_when_the_id_exists() throws Exception {
-
                 // arrange
                 LocalDateTime ldt = LocalDateTime.parse("2022-01-03T00:00:00");
 
                 MenuItemReview menuItemReview = MenuItemReview.builder()
-                                .name("firstDayOfClasses")
-                                .quarterYYYYQ("20222")
-                                .localDateTime(ldt)
+                                .itemId(10L)
+                                .reviewerEmail("ethanlee@ucsb.edu")
+                                .stars(3)
+                                .dateReviewed(ldt)
+                                .comments("ok")
                                 .build();
 
-                when(ucsbDateRepository.findById(eq(7L))).thenReturn(Optional.of(ucsbDate));
+                when(menuItemReviewRepository.findById(eq(7L))).thenReturn(Optional.of(menuItemReview));
 
                 // act
-                MvcResult response = mockMvc.perform(get("/api/ucsbdates?id=7"))
+                MvcResult response = mockMvc.perform(get("/api/MenuItemReview?id=7"))
                                 .andExpect(status().isOk()).andReturn();
 
                 // assert
 
-                verify(ucsbDateRepository, times(1)).findById(eq(7L));
-                String expectedJson = mapper.writeValueAsString(ucsbDate);
+                verify(menuItemReviewRepository, times(1)).findById(eq(7L));
+                String expectedJson = mapper.writeValueAsString(menuItemReview);
                 String responseString = response.getResponse().getContentAsString();
                 assertEquals(expectedJson, responseString);
         }
@@ -113,20 +113,16 @@ public class MenuItemReviewControllerTests extends ControllerTestCase {
         public void test_that_logged_in_user_can_get_by_id_when_the_id_does_not_exist() throws Exception {
 
                 // arrange
-
-                when(ucsbDateRepository.findById(eq(7L))).thenReturn(Optional.empty());
-
+                when(menuItemReviewRepository.findById(eq(7L))).thenReturn(Optional.empty());
                 // act
-                MvcResult response = mockMvc.perform(get("/api/ucsbdates?id=7"))
+                MvcResult response = mockMvc.perform(get("/api/MenuItemReview?id=7"))
                                 .andExpect(status().isNotFound()).andReturn();
-
                 // assert
-
-                verify(ucsbDateRepository, times(1)).findById(eq(7L));
+                verify(menuItemReviewRepository, times(1)).findById(eq(7L));
                 Map<String, Object> json = responseToJson(response);
                 assertEquals("EntityNotFoundException", json.get("type"));
-                assertEquals("UCSBDate with id 7 not found", json.get("message"));
-        }*/
+                assertEquals("MenuItemReview with id 7 not found", json.get("message"));
+        }
 
         @WithMockUser(roles = { "USER" })
         @Test
