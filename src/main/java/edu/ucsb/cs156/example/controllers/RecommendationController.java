@@ -42,26 +42,15 @@ public class RecommendationController extends ApiController {
         return recs;
     }
 
-    @ApiOperation(value = "Get a recommendation by ID")
-    @PreAuthorize("hasRole('ROLE_USER')")
-    @GetMapping("")
-    public Recommendation getById(
-        @ApiParam("id") @RequestParam Long id) {
-        Recommendation recommendation = recommendationRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(Recommendation.class, id));
-        
-        return recommendation;
-    }
-
     @ApiOperation(value = "Create a new recommendation request")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/post")
     public Recommendation postRecommendation(
-        @ApiParam("requesterEmail") @RequestParam String requesterEmail,
-        @ApiParam("professorEmail") @RequestParam String professorEmail,
+        @ApiParam("requester email") @RequestParam String requesterEmail,
+        @ApiParam("professor email") @RequestParam String professorEmail,
         @ApiParam("explanation") @RequestParam String explanation,
-        @ApiParam("dateRequested") @RequestParam("dateRequested") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateRequested,
-        @ApiParam("dateNeeded") @RequestParam("dateNeeded") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateNeeded,
+        @ApiParam("date requested (in iso format, e.g. YYYY-mm-ddTHH:MM:SS; see https://en.wikipedia.org/wiki/ISO_8601)") @RequestParam("dateRequested") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateRequested,
+        @ApiParam("date needed (in iso format, e.g. YYYY-mm-ddTHH:MM:SS; see https://en.wikipedia.org/wiki/ISO_8601)") @RequestParam("dateNeeded") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateNeeded,
         @ApiParam("done") @RequestParam boolean done
     ) throws JsonProcessingException {
         log.info("dateRequested={}, dateNeeded={}", dateRequested, dateNeeded);
