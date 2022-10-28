@@ -237,6 +237,7 @@ public class ArticleControllerTests extends ControllerTestCase {
                 assertEquals("Article with id ArticleFour deleted", json.get("message"));
         }
         
+<<<<<<< HEAD
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
         public void admin_tries_to_delete_non_existant_article_and_gets_right_error_message()
@@ -333,4 +334,8 @@ public class ArticleControllerTests extends ControllerTestCase {
                 Map<String, Object> json = responseToJson(response);
                 assertEquals("Article with id ArticleDoesntExist not found", json.get("message"));
         }
+=======
+        
+        
+>>>>>>> a0e22d84c1747529f97325473a3fe0d76dc52def
 }
