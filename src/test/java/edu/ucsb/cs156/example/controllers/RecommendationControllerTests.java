@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -245,5 +246,91 @@ public class RecommendationControllerTests extends ControllerTestCase {
         verify(recommendationRepository, times(1)).findById(15L);
         Map<String, Object> json = responseToJson(response);
         assertEquals("Recommendation with id 15 not found", json.get("message"));
+    }
+
+    // Controller tests for PUT endpoint
+
+    @WithMockUser(roles = { "ADMIN", "USER" })
+    @Test
+    public void admin_can_edit_an_existing_recommendation() throws Exception {
+        // arrange
+
+        LocalDateTime ldt1 = LocalDateTime.parse("2022-01-01T00:00:00");
+        LocalDateTime ldt2 = LocalDateTime.parse("2023-01-02T00:00:00");
+        LocalDateTime ldt3 = LocalDateTime.parse("2023-01-03T00:00:00");
+        LocalDateTime ldt4 = LocalDateTime.parse("2023-01-04T00:00:00");
+
+        Recommendation recommendationOrig = Recommendation.builder()
+                        .requesterEmail("req@mail.com")
+                        .professorEmail("prof@mail.com")
+                        .explanation("original")
+                        .dateRequested(ldt1)
+                        .dateNeeded(ldt2)
+                        .done(false)
+                        .build();
+
+        Recommendation recommendationEdited = Recommendation.builder()
+                        .requesterEmail("dantik@mail.com")
+                        .professorEmail("lusik@mail.com")
+                        .explanation("edited ft my cats")
+                        .dateRequested(ldt3)
+                        .dateNeeded(ldt4)
+                        .done(true)
+                        .build();
+
+        String requestBody = mapper.writeValueAsString(recommendationEdited);
+
+        when(recommendationRepository.findById(eq(67L))).thenReturn(Optional.of(recommendationOrig));
+
+        // act
+        MvcResult response = mockMvc.perform(
+                        put("/api/recommendations?id=67")
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .characterEncoding("utf-8")
+                                        .content(requestBody)
+                                        .with(csrf()))
+                        .andExpect(status().isOk()).andReturn();
+
+        // assert
+        verify(recommendationRepository, times(1)).findById(67L);
+        verify(recommendationRepository, times(1)).save(recommendationEdited); // should be saved with correct user
+        String responseString = response.getResponse().getContentAsString();
+        assertEquals(requestBody, responseString);
+    }
+
+    @WithMockUser(roles = { "ADMIN", "USER" })
+    @Test
+    public void admin_cannot_edit_recommendation_that_does_not_exist() throws Exception {
+        // arrange
+
+        LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03T00:00:00");
+        LocalDateTime ldt2 = LocalDateTime.parse("2022-01-04T00:00:00");
+
+        Recommendation recommendationEdited = Recommendation.builder()
+                        .requesterEmail("dantik@mail.com")
+                        .professorEmail("lusik@mail.com")
+                        .explanation("edited ft my cats")
+                        .dateRequested(ldt1)
+                        .dateNeeded(ldt2)
+                        .done(true)
+                        .build();
+
+        String requestBody = mapper.writeValueAsString(recommendationEdited);
+
+        when(recommendationRepository.findById(eq(67L))).thenReturn(Optional.empty());
+
+        // act
+        MvcResult response = mockMvc.perform(
+                        put("/api/recommendations?id=67")
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .characterEncoding("utf-8")
+                                        .content(requestBody)
+                                        .with(csrf()))
+                        .andExpect(status().isNotFound()).andReturn();
+
+        // assert
+        verify(recommendationRepository, times(1)).findById(67L);
+        Map<String, Object> json = responseToJson(response);
+        assertEquals("Recommendation with id 67 not found", json.get("message"));
     }
 }
