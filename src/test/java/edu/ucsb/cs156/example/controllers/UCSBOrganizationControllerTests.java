@@ -177,14 +177,14 @@ public class UCSBOrganizationControllerTests  extends ControllerTestCase {
                                 .orgCode("test")
                                 .orgTranslation("test1")
                                 .orgTranslationShort("test2")
-                                .inactive(false)
+                                .inactive(true)
                                 .build();
 
                 when(ucsbOrganizationRepository.save(organization)).thenReturn(organization);
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                post("/api/ucsborganization/post?orgCode=test&orgTranslation=test1&orgTranslationShort=test2&inactive=false")
+                                post("/api/ucsborganization/post?orgCode=test&orgTranslation=test1&orgTranslationShort=test2&inactive=true")
                                                 .with(csrf()))
                                 .andExpect(status().isOk()).andReturn();
 
