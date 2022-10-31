@@ -187,7 +187,7 @@ public class UCSBHelpRequestTests extends ControllerTestCase {
                 .requestTime(ldt1)
                 .requesterEmail("batman@wayne.com")
                 .solved(false)
-                .tableOrBreakoutRoom("BreakoutRoom")
+                .tableOrBreakoutRoom("table")
                 .teamId("2023")
                 .build();
 
@@ -196,7 +196,39 @@ public class UCSBHelpRequestTests extends ControllerTestCase {
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                post("/api/ucsbhelprequest/post?explanation=I'm batman!&requestTime=2022-01-03T00:00:00&requesterEmail=batman@wayne.com&solved=false&tableOrBreakoutRoom=BreakoutRoom&teamId=2023")
+                                post("/api/ucsbhelprequest/post?explanation=I'm batman!&requestTime=2022-01-03T00:00:00&requesterEmail=batman@wayne.com&solved=false&tableOrBreakoutRoom=table&teamId=2023")
+                                                .with(csrf()))
+                                .andExpect(status().isOk()).andReturn();
+
+                // assert
+                verify(ucsbHelpRequestRepository, times(1)).save(ucsbHelpRequest1);
+                String expectedJson = mapper.writeValueAsString(ucsbHelpRequest1);
+                String responseString = response.getResponse().getContentAsString();
+                assertEquals(expectedJson, responseString);
+        }
+
+        @WithMockUser(roles = { "ADMIN", "USER" })
+        @Test
+        public void an_admin_user_can_post_a_new_ucsbdate1() throws Exception {
+                // arrange
+
+                LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03T00:00:00");
+
+                UCSBHelpRequest ucsbHelpRequest1 = UCSBHelpRequest.builder()
+                .explanation("I'm batman!")
+                .requestTime(ldt1)
+                .requesterEmail("batman@wayne.com")
+                .solved(true)
+                .tableOrBreakoutRoom("table")
+                .teamId("2023")
+                .build();
+
+
+                when(ucsbHelpRequestRepository.save(eq(ucsbHelpRequest1))).thenReturn(ucsbHelpRequest1);
+
+                // act
+                MvcResult response = mockMvc.perform(
+                                post("/api/ucsbhelprequest/post?explanation=I'm batman!&requestTime=2022-01-03T00:00:00&requesterEmail=batman@wayne.com&solved=true&tableOrBreakoutRoom=table&teamId=2023")
                                                 .with(csrf()))
                                 .andExpect(status().isOk()).andReturn();
 
@@ -220,7 +252,7 @@ public class UCSBHelpRequestTests extends ControllerTestCase {
                 .tableOrBreakoutRoom("BreakoutRoom")
                 .requestTime(ldt1)
                 .explanation("I'm batman!")
-                .solved(false)
+                .solved(true)
                 .build();
 
                 when(ucsbHelpRequestRepository.findById(eq(15L))).thenReturn(Optional.of(ucsbHelpRequest1));
@@ -278,10 +310,10 @@ public class UCSBHelpRequestTests extends ControllerTestCase {
                     UCSBHelpRequest ucsbHelpRequestEdited = UCSBHelpRequest.builder()
                 .requesterEmail("batman@wayne111.com")
                 .teamId("2023111")
-                .tableOrBreakoutRoom("BreakoutRoom")
+                .tableOrBreakoutRoom("table")
                 .requestTime(ldt2)
                 .explanation("I'm batman111!")
-                .solved(false)
+                .solved(true)
                 .build();
 
                 String requestBody = mapper.writeValueAsString(ucsbHelpRequestEdited);
