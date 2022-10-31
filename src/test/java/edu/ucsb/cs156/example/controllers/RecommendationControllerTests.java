@@ -176,14 +176,14 @@ public class RecommendationControllerTests extends ControllerTestCase {
                         .explanation("test")
                         .dateRequested(ldt1)
                         .dateNeeded(ldt2)
-                        .done(false)
+                        .done(true)
                         .build();
 
         when(recommendationRepository.save(eq(recommendation))).thenReturn(recommendation);
 
         // act
         MvcResult response = mockMvc.perform(
-                        post("/api/recommendations/post?requesterEmail=requester@mail.com&professorEmail=professor@mail.com&explanation=test&dateRequested=2022-01-03T00:00:00&dateNeeded=2022-01-04T00:00:00&done=false")
+                        post("/api/recommendations/post?requesterEmail=requester@mail.com&professorEmail=professor@mail.com&explanation=test&dateRequested=2022-01-03T00:00:00&dateNeeded=2022-01-04T00:00:00&done=true")
                                         .with(csrf()))
                         .andExpect(status().isOk()).andReturn();
 
