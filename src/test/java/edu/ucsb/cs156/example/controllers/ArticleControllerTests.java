@@ -263,6 +263,8 @@ public class ArticleControllerTests extends ControllerTestCase {
                 // arrange
 
                 LocalDateTime ldt = LocalDateTime.parse("2022-01-03T00:00:00");
+                LocalDateTime ldtedited = LocalDateTime.parse("2022-01-03T00:00:01");
+
 
                 Article article = Article.builder()
                                 .title("ArticleOne")
@@ -275,9 +277,9 @@ public class ArticleControllerTests extends ControllerTestCase {
                 Article articleEdited = Article.builder()
                                 .title("ArticleOneEdited")
                                 .url("articleoneedited")
-                                .explanation("articleone explanation")
-                                .email("liamjet@gmail.com")
-                                .dateAdded(ldt)
+                                .explanation("articleoneedited explanation")
+                                .email("liamjetedited@gmail.com")
+                                .dateAdded(ldtedited)
                                 .build();
 
                 String requestBody = mapper.writeValueAsString(articleEdited);
