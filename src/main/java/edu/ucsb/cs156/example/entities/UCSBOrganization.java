@@ -19,10 +19,8 @@ import lombok.Builder;
 @Entity(name = "ucsborganizations")
 public class UCSBOrganization {
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long id;
-
   private String orgCode;
+ // @GeneratedValue(strategy = GenerationType.IDENTITY)
   private String orgTranslationShort;  
   private String orgTranslation;
   private boolean inactive;
