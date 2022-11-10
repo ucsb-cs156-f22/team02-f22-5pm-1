@@ -59,7 +59,7 @@ public class UCSBOrganizationControllerTests  extends ControllerTestCase {
 
         @Test
         public void logged_out_users_cannot_get_by_id() throws Exception {
-                mockMvc.perform(get("/api/ucsborganization?code=12345"))
+                mockMvc.perform(get("/api/ucsborganization?code=test"))
                                 .andExpect(status().is(403)); // logged out users can't get by id
         }
 
@@ -88,22 +88,21 @@ public class UCSBOrganizationControllerTests  extends ControllerTestCase {
                 // arrange
 
                 UCSBOrganization organization = UCSBOrganization.builder()
-                                .id(1234)
                                 .orgCode("test")
                                 .orgTranslation("test1")
                                 .orgTranslationShort("test2")
                                 .inactive(false)
                                 .build();
 
-                when(ucsbOrganizationRepository.findById((long)1234)).thenReturn(Optional.of(organization));
+                when(ucsbOrganizationRepository.findById("test")).thenReturn(Optional.of(organization));
 
                 // act
-                MvcResult response = mockMvc.perform(get("/api/ucsborganization?code=1234"))
+                MvcResult response = mockMvc.perform(get("/api/ucsborganization?code=test"))
                                 .andExpect(status().isOk()).andReturn();
 
                 // assert
 
-                verify(ucsbOrganizationRepository, times(1)).findById((long) 1234);
+                verify(ucsbOrganizationRepository, times(1)).findById("test");
                 String expectedJson = mapper.writeValueAsString(organization);
                 String responseString = response.getResponse().getContentAsString();
                 assertEquals(expectedJson, responseString);
@@ -115,18 +114,18 @@ public class UCSBOrganizationControllerTests  extends ControllerTestCase {
 
                 // arrange
 
-                when(ucsbOrganizationRepository.findById((long)1234)).thenReturn(Optional.empty());
+                when(ucsbOrganizationRepository.findById("test")).thenReturn(Optional.empty());
 
                 // act
-                MvcResult response = mockMvc.perform(get("/api/ucsborganization?code=1234"))
+                MvcResult response = mockMvc.perform(get("/api/ucsborganization?code=test"))
                                 .andExpect(status().isNotFound()).andReturn();
 
                 // assert
 
-                verify(ucsbOrganizationRepository, times(1)).findById((long)1234);
+                verify(ucsbOrganizationRepository, times(1)).findById("test");
                 Map<String, Object> json = responseToJson(response);
                 assertEquals("EntityNotFoundException", json.get("type"));
-                assertEquals("UCSBOrganization with id 1234 not found", json.get("message"));
+                assertEquals("UCSBOrganization with id test not found", json.get("message"));
         }
 
         @WithMockUser(roles = { "USER" })
@@ -136,7 +135,6 @@ public class UCSBOrganizationControllerTests  extends ControllerTestCase {
                 // arrange
 
                 UCSBOrganization organization1 = UCSBOrganization.builder()
-                                .id(1234)
                                 .orgCode("test")
                                 .orgTranslation("test1")
                                 .orgTranslationShort("test2")
@@ -144,7 +142,6 @@ public class UCSBOrganizationControllerTests  extends ControllerTestCase {
                                 .build();
 
                 UCSBOrganization organization2 = UCSBOrganization.builder()
-                                .id(5555)
                                 .orgCode("test5")
                                 .orgTranslation("test5")
                                 .orgTranslationShort("test5")
@@ -201,27 +198,26 @@ public class UCSBOrganizationControllerTests  extends ControllerTestCase {
                 // arrange
 
                 UCSBOrganization organization = UCSBOrganization.builder()
-                                .id(1234)
                                 .orgCode("test")
                                 .orgTranslation("test1")
                                 .orgTranslationShort("test2")
                                 .inactive(false)
                                 .build();
 
-                when(ucsbOrganizationRepository.findById((long)1234)).thenReturn(Optional.of(organization));
+                when(ucsbOrganizationRepository.findById("test")).thenReturn(Optional.of(organization));
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                delete("/api/ucsborganization?code=1234")
+                                delete("/api/ucsborganization?code=test")
                                                 .with(csrf()))
                                 .andExpect(status().isOk()).andReturn();
 
                 // assert
-                verify(ucsbOrganizationRepository, times(1)).findById((long)1234);
+                verify(ucsbOrganizationRepository, times(1)).findById("test");
                 verify(ucsbOrganizationRepository, times(1)).delete(any());
 
                 Map<String, Object> json = responseToJson(response);
-                assertEquals("UCSBOrganization with id 1234 deleted", json.get("message"));
+                assertEquals("UCSBOrganization with id test deleted", json.get("message"));
         }
 
         @WithMockUser(roles = { "ADMIN", "USER" })
@@ -230,18 +226,18 @@ public class UCSBOrganizationControllerTests  extends ControllerTestCase {
                         throws Exception {
                 // arrange
 
-                when(ucsbOrganizationRepository.findById((long)1234)).thenReturn(Optional.empty());
+                when(ucsbOrganizationRepository.findById("test")).thenReturn(Optional.empty());
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                delete("/api/ucsborganization?code=1234")
+                                delete("/api/ucsborganization?code=test")
                                                 .with(csrf()))
                                 .andExpect(status().isNotFound()).andReturn();
 
                 // assert
-                verify(ucsbOrganizationRepository, times(1)).findById((long)1234);
+                verify(ucsbOrganizationRepository, times(1)).findById("test");
                 Map<String, Object> json = responseToJson(response);
-                assertEquals("UCSBOrganization with id 1234 not found", json.get("message"));
+                assertEquals("UCSBOrganization with id test not found", json.get("message"));
         }
 
         @WithMockUser(roles = { "ADMIN", "USER" })
@@ -250,7 +246,6 @@ public class UCSBOrganizationControllerTests  extends ControllerTestCase {
                 // arrange
 
                 UCSBOrganization testOrig = UCSBOrganization.builder()
-                                .id(1234)
                                 .orgCode("test")
                                 .orgTranslation("test1")
                                 .orgTranslationShort("test2")
@@ -258,7 +253,6 @@ public class UCSBOrganizationControllerTests  extends ControllerTestCase {
                                 .build();
 
                 UCSBOrganization testEdited = UCSBOrganization.builder()
-                                .id(1234)
                                 .orgCode("test5")
                                 .orgTranslation("test5")
                                 .orgTranslationShort("test5")
@@ -267,11 +261,11 @@ public class UCSBOrganizationControllerTests  extends ControllerTestCase {
 
                 String requestBody = mapper.writeValueAsString(testEdited);
 
-                when(ucsbOrganizationRepository.findById((long)1234)).thenReturn(Optional.of(testOrig));
+                when(ucsbOrganizationRepository.findById("test")).thenReturn(Optional.of(testOrig));
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                put("/api/ucsborganization?code=1234")
+                                put("/api/ucsborganization?code=test")
                                                 .contentType(MediaType.APPLICATION_JSON)
                                                 .characterEncoding("utf-8")
                                                 .content(requestBody)
@@ -279,7 +273,7 @@ public class UCSBOrganizationControllerTests  extends ControllerTestCase {
                                 .andExpect(status().isOk()).andReturn();
 
                 // assert
-                verify(ucsbOrganizationRepository, times(1)).findById((long)1234);
+                verify(ucsbOrganizationRepository, times(1)).findById("test");
                 verify(ucsbOrganizationRepository, times(1)).save(testEdited); // should be saved with updated info
                 String responseString = response.getResponse().getContentAsString();
                 assertEquals(requestBody, responseString);
@@ -291,7 +285,6 @@ public class UCSBOrganizationControllerTests  extends ControllerTestCase {
                 // arrange
 
                 UCSBOrganization editedTest = UCSBOrganization.builder()
-                                .id(1234)
                                 .orgCode("test5")
                                 .orgTranslation("test5")
                                 .orgTranslationShort("test5")
@@ -300,11 +293,11 @@ public class UCSBOrganizationControllerTests  extends ControllerTestCase {
 
                 String requestBody = mapper.writeValueAsString(editedTest);
 
-                when(ucsbOrganizationRepository.findById((long)1234)).thenReturn(Optional.empty());
+                when(ucsbOrganizationRepository.findById("test")).thenReturn(Optional.empty());
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                put("/api/ucsborganization?code=1234")
+                                put("/api/ucsborganization?code=test")
                                                 .contentType(MediaType.APPLICATION_JSON)
                                                 .characterEncoding("utf-8")
                                                 .content(requestBody)
@@ -312,9 +305,9 @@ public class UCSBOrganizationControllerTests  extends ControllerTestCase {
                                 .andExpect(status().isNotFound()).andReturn();
 
                 // assert
-                verify(ucsbOrganizationRepository, times(1)).findById((long)1234);
+                verify(ucsbOrganizationRepository, times(1)).findById("test");
                 Map<String, Object> json = responseToJson(response);
-                assertEquals("UCSBOrganization with id 1234 not found", json.get("message"));
+                assertEquals("UCSBOrganization with id test not found", json.get("message"));
 
         }
 }
